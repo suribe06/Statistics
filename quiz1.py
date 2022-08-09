@@ -1,8 +1,8 @@
+#Made by Sebastian Daza and Santiago Uribe
+
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.utils import resample
-
-N = 5000 #poblacion
 
 theta = 34 #parametro
 n_space = [50, 100, 1000]#tamanos de muestra
@@ -23,13 +23,20 @@ for n in n_space:
     plt.clf()
     plt.hist(vec_theta_1)
     plt.title("Histogram for $\\theta_1$ and n={}".format(n))
-    plt.ylabel("Frecuencia")
+    plt.ylabel("Frequency")
     plt.xlabel("$\\theta_1$")
     plt.savefig(f"theta1_n{n}.png")
 
     plt.clf()
     plt.hist(vec_theta_2)
     plt.title("Histogram for $\\theta_2$ and n={}".format(n))
-    plt.ylabel("Frecuencia")
+    plt.ylabel("Frequency")
     plt.xlabel("$\\theta_2$")
     plt.savefig(f"theta2_n{n}.png")
+
+
+"""
+Comentarios de los resultados obtenidos:
+
+
+"""
