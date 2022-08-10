@@ -1,6 +1,7 @@
 #Made by Sebastian Daza and Santiago Uribe
 
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.utils import resample
 
@@ -28,7 +29,7 @@ for n in n_space:
     plt.savefig(f"theta1_n{n}.png")
 
     plt.clf()
-    plt.hist(vec_theta_2)
+    sns.histplot(vec_theta_2, kde=True, stat="density", linewidth=0, color='darkblue')
     plt.title("Histogram for $\\theta_2$ and n={}".format(n))
     plt.ylabel("Frequency")
     plt.xlabel("$\\theta_2$")
