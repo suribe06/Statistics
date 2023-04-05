@@ -1,0 +1,422 @@
+---
+title: Parcial 2 Santiago Uribe
+format:
+  html:
+    code-fold: true
+jupyter: python3
+---
+
+Made By: Santiago Uribe (suribe06@javerianacali.edu.co)
+
+```{python}
+#| id: bsFeoc0Ki-JE
+import pandas as pd
+import statsmodels.formula.api as smf
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+```
+
+# Punto 1
+
+```{python}
+#| id: MgU1cKECjY_k
+#| colab: {base_uri: 'https://localhost:8080/', height: 537}
+#| outputId: a5ef4e9a-8875-40e1-8cf8-ce66ed57f2f5
+df = pd.read_excel('Datos_Vivienda.xlsx', sheet_name='Datos Vivienda')
+dim_df = df.shape
+print(f"The dataset consists of {dim_df[0]} rows and {dim_df[1]} columns")
+```
+
+Let's check how much missing data there is by columns
+
+```{python}
+# Missing values by column
+df.isnull().sum()
+```
+
+```{python}
+#| id: Gg-zSSO4upv4
+# delete records that have more than 6 missing data in their columns
+df = df.dropna(thresh=len(df.columns)-6)
+```
+
+```{python}
+#| id: ivjUhR9outLS
+#| colab: {base_uri: 'https://localhost:8080/'}
+#| outputId: 08203b87-04db-4a16-af7f-b44bec283248
+dim_df = df.shape
+print(f"The dataset consists of {dim_df[0]} rows and {dim_df[1]} columns")
+```
+
+```{python}
+#| id: b7wtqtRGuJFr
+#| colab: {base_uri: 'https://localhost:8080/'}
+#| outputId: 1fe4e20c-6178-4843-a26a-01659df8631a
+# Missing values by column
+df.isnull().sum()
+```
+
+Since the 'piso' and 'parqueaderos' attributes will not be used in this study, we eliminated the columns by having so much missing data, \% and 20\% respectively.
+
+```{python}
+#| id: gJy5r-Ksxxmj
+#| colab: {base_uri: 'https://localhost:8080/'}
+#| outputId: 0b830a4a-f8a4-4647-8c6d-239d138c181d
+df.drop('piso', axis=1, inplace=True)
+df.drop('parqueaderos', axis=1, inplace=True)
+```
+
+# Descriptive Statistics
+Let's look at some graphs and measures of central tendency of our variables of interest.
+
+```{python}
+#| id: BpsdI9QamSby
+#| colab: {base_uri: 'https://localhost:8080/', height: 300}
+#| outputId: f379abe4-d2f1-4013-d7b9-69b1148397b6
+df.describe()
+```
+
+```{python}
+#| id: P57nKKXYnEJF
+#Separate attributes by type
+obj_attributes = df.select_dtypes(include=['object']).columns.to_list()
+float_attributes = df.select_dtypes(include=['float']).columns.to_list()
+```
+
+# Bar Diagrams and Pie Diagram
+
+```{python}
+#| id: pFmKy_Z2rhnd
+#| colab: {base_uri: 'https://localhost:8080/', height: 407}
+#| outputId: ebfd04ae-8bfe-487d-b300-aa12d6dfc7e9
+fig, axs = plt.subplots(1, 2, figsize=(8,4))
+axs = axs.ravel()
+
+for i, col in enumerate(obj_attributes):
+  if col != 'Barrio':
+    sns.countplot(x=col, data=df, ax=axs[i], edgecolor='black')
+    axs[i].set_title(col)
+    axs[i].set_xticklabels(axs[i].get_xticklabels(), rotation=90)
+
+plt.tight_layout()
+plt.show()
+```
+
+Let's see the proportion of neighborhoods in the dataset.
+
+```{python}
+#| id: wbPM64Uxpq-Y
+#| colab: {base_uri: 'https://localhost:8080/', height: 429}
+#| outputId: 87558af0-a646-44d4-f656-ed9800853128
+from matplotlib.colors import ListedColormap
+
+# Obtain the housing count by neighborhood
+count_by_barrio = df['Barrio'].value_counts()
+
+# Create labels
+labels_ = count_by_barrio.index[:10].tolist()
+
+# Calculate the sum of the smallest values and add it to the list of labels
+sum_low_values = count_by_barrio.iloc[10:].sum()
+labels_.append('Otros')
+
+# Create pie chart
+fig = plt.figure(facecolor='white')
+colores = sns.color_palette("Set3", n_colors=11)
+paleta_colores = ListedColormap(colores)
+plt.pie(count_by_barrio[:10].tolist() + [sum_low_values], labels=labels_, autopct='%1.1f%%', colors=paleta_colores.colors)
+plt.axis('equal')
+plt.title('Distribución por barrio')
+plt.show()
+```
+
+# Histograms
+
+```{python}
+#| id: 1tZVV3mknr4S
+#| colab: {base_uri: 'https://localhost:8080/', height: 507}
+#| outputId: 829a8abd-3496-4b36-ffcf-878970d91945
+fig, axs = plt.subplots(2, 4, figsize=(10,5))
+axs = axs[:8].ravel()
+
+for i, col in enumerate(float_attributes):
+    if col != 'Estrato':
+        axs[i].hist(df[col], edgecolor='black')
+        axs[i].set_title(col)
+    else:
+        axs[i].bar(df[col].value_counts().index, df[col].value_counts().values, edgecolor='black')
+
+plt.tight_layout()
+plt.show()
+```
+
+# Box Plots
+
+```{python}
+#| id: 5hPQDwpzr1GJ
+#| colab: {base_uri: 'https://localhost:8080/', height: 507}
+#| outputId: 8f281c02-52f2-405d-bcc9-282492bd9576
+import matplotlib.patches as mpatches
+
+fliers = dict(markerfacecolor='m', marker='D') #atypical data
+mean_ = dict(markerfacecolor='green', marker='D')
+mean_artist = mpatches.Patch(facecolor='green', label='Mean')
+ad_artist = mpatches.Patch(color='m', label='Atypical Data')
+
+fig, axs = plt.subplots(2, 4, figsize=(10,5))
+axs = axs[:8].ravel()
+for i, col in enumerate(float_attributes):
+  bp = axs[i].boxplot(df[col], vert=False, flierprops=fliers, showmeans=True, meanprops=mean_)
+  axs[i].legend(handles=[mean_artist, ad_artist], loc='upper left', fontsize=8)
+  axs[i].set_title(col)
+
+plt.tight_layout()
+plt.show()
+```
+
+# Correlation
+
+```{python}
+#| id: j_x7yHb0zM0K
+#| colab: {base_uri: 'https://localhost:8080/', height: 576}
+#| outputId: b7e50fe1-027d-40a5-ff5a-df6ed5b0ecb7
+sns.heatmap(df.corr(), square=True, annot=True)
+```
+
+As can be seen in the correlation table, the variables 'Area_contruida' and 'precio_millon' have a direct positive relationship, of approximately 0.7
+
+# Simple Linear Regression (precio_millon - Area_contruida)
+
+```{python}
+#| id: h3WPi-mukUny
+#| colab: {base_uri: 'https://localhost:8080/', height: 424}
+#| outputId: cc5d11a3-c5d4-48ec-c00e-18f96f811b70
+df_el_ingenio = df[df['Barrio'] == 'el ingenio'][['precio_millon', 'Area_contruida']]
+```
+
+```{python}
+#| id: gE7fE-bck9gV
+#| colab: {base_uri: 'https://localhost:8080/'}
+#| outputId: 3b7edd72-00df-4711-c97e-a54f4b8edd22
+# Create the SLR model
+modelo = smf.ols('precio_millon ~ Area_contruida', data=df_el_ingenio).fit()
+print(modelo.summary())
+```
+
+The SLR model is given by:
+
+$$ Y = 1.21 X + 195.71 $$
+
+Where $Y$ is 'precio_millon' and 'X' is 'Area_contruida'. The R-squared value of the model is approximately 0.78, which indicates that the proportion of the variability in the dependent variable is well explained by the independent variable. We can see that the standard error for both the intercept and the slope are small so the coefficients are accurate.
+
+```{python}
+#| id: cgBkcRsMlRvM
+#| colab: {base_uri: 'https://localhost:8080/', height: 472}
+#| outputId: b066edb3-7365-4ebb-f65e-5f287bb6f5e1
+plt.scatter(df_el_ingenio.Area_contruida, df_el_ingenio.precio_millon)
+plt.plot(df_el_ingenio.Area_contruida, modelo.predict(), color='red', linewidth=2)
+plt.xlabel('Area construida')
+plt.ylabel('Precio por millon')
+plt.title('Simple Linear Regression')
+plt.show()
+```
+
+# Check model assumptions
+
+```{python}
+from scipy.stats import shapiro
+from statsmodels.stats.diagnostic import het_breuschpagan
+
+def checkModelAssumptions(model):
+    residuos = model.resid
+    fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(12, 6))
+    #QQ plot
+    sm.qqplot(residuos, line='45', ax=axs[0,0])
+    axs[0,0].set_title('Residuals Q-Q plot')
+    #Residuals Histogram
+    axs[0,1].hist(residuos, bins=30, edgecolor='black')
+    axs[0,1].set_xlabel('Residuos')
+    axs[0,1].set_ylabel('Frecuencia')
+    axs[0,1].set_title('Residuals Histogram')
+    #Reiduals Boxplot
+    axs[0,2].boxplot(residuos)
+    axs[0,2].set_ylabel('Residuals')
+    axs[0,2].set_title('Residuals Boxplot')
+    #Residuals
+    axs[1,0].scatter(model.fittedvalues, residuos)
+    axs[1,0].plot([min(model.fittedvalues), max(model.fittedvalues)], [0, 0], 'k--', lw=2)
+    axs[1,0].set_xlabel('Fitted Values')
+    axs[1,0].set_ylabel('Residuals')
+    axs[1,0].set_title('Residuals')
+    #Standarized residuals
+    predicciones = model.predict()
+    residuos_estandarizados = model.get_influence().resid_studentized_internal
+    axs[1,1].scatter(predicciones, residuos_estandarizados)
+    axs[1,1].plot([min(predicciones), max(predicciones)], [0, 0], 'k--', lw=2)
+    axs[1,1].set_xlabel('Valores predichos')
+    axs[1,1].set_ylabel('Residuos estandarizados')
+    axs[1,1].set_title('Standarized Residuals')
+    #Plot fit
+    sm.graphics.plot_fit(model, 'Area_contruida', ax=axs[1,2])
+    axs[1,2].set_xlabel("Area construida")
+    axs[1,2].set_ylabel("Precio por millón")
+    axs[1,2].set_title("Linear Regression")
+
+    plt.tight_layout()
+    plt.show()
+
+    #Normality test
+    print('================= Normality test =================')
+    stat, p = shapiro(residuos)
+    print('Estadística de prueba:', stat)
+    print('Valor p:', p)
+    if p <= 0.05: print("Se rechaza H0")
+    else: print("No se rechaza H0")
+    #Homoscedasticity test
+    print('================= Homoscedasticity test =================')
+    lm, lm_pvalue, fvalue, f_pvalue = het_breuschpagan(residuos, model.model.exog)
+    print('Lagrange multiplier statistic:', lm)
+    print('p-value', lm_pvalue)
+    print('F value:', fvalue)
+    print('F p-value', f_pvalue)
+    if lm_pvalue <= 0.05: print("Se rechaza H0")
+    else: print("No se rechaza H0")
+```
+
+```{python}
+checkModelAssumptions(modelo)
+```
+
+Analysis: 
+- Normality test: Since the null hypothesis is rejected, the residuals are not from a normal distribution. It can also be verified that the QQ plot does not conform to a normal distribution.
+- Homoscedasticity test: Since H0 is rejected, it means that there is sufficient evidence to conclude that the variance of the errors is not constant and, therefore, that there is heteroscedasticity in the model.
+- Independecy and lineality: In both residual plots we can see that the residuals follow a tendency to cluster to the left, so the model variables are not linear. 
+
+# Categorical Regression
+
+```{python}
+df2 = df[df['Barrio'] == 'el ingenio'][['precio_millon', 'Area_contruida', 'Tipo']]
+
+df_casa = df2[df2['Tipo'] == 'Casa']
+df_apto = df2[df2['Tipo'] == 'Apartamento']
+plt.scatter(df_casa['Area_contruida'], df_casa['precio_millon'], marker='o', label='Casa')
+plt.scatter(df_apto['Area_contruida'], df_apto['precio_millon'], marker='x', label='Apartamento')
+# Configurar la gráfica
+plt.xlabel('Area construida')
+plt.ylabel('Precio (millones)')
+plt.legend()
+plt.show()
+```
+
+In this case, a model could have the following structure:
+$$ Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \varepsilon $$
+where $X_2$ can take the values of zero or one, according to the type of housing. For example:
+$$ X_2 = \begin{cases}
+0, & \text{si la vivienda es una casa.} \\
+1, & \text{si la vivienda es un apartamento.}
+\end{cases} $$
+
+```{python}
+#Create the dummy column
+df_el_ingenio['Tipo_Dummy'] = df2["Tipo"].map({"Casa": 0, "Apartamento": 1})
+```
+
+```{python}
+#df_dummies = pd.get_dummies(df2['Tipo'], prefix='Tipo')
+#df_el_ingenio = pd.concat([df_el_ingenio, df_dummies], axis=1)
+```
+
+```{python}
+#| id: GjBPNPKqAQ97
+#| colab: {base_uri: 'https://localhost:8080/'}
+#| outputId: 181d1bed-7b0c-401f-9323-beb38d382d9d
+# Ajustar el modelo de regresión lineal
+modelo2 = smf.ols(formula='precio_millon ~ Area_contruida + Tipo_Dummy', data=df_el_ingenio).fit()
+print(modelo2.summary())
+```
+
+The model is given by:
+$$ Y = 1.02 X_1 - 99.24 X_2 + 295.36 $$
+
+```{python}
+#| id: wd8x-uVNBRUr
+#| colab: {base_uri: 'https://localhost:8080/', height: 472}
+#| outputId: cf4553f4-44d8-4f83-a464-302887059a95
+# Graficar el modelo
+sns.regplot(x='Area_contruida', y='precio_millon', data=df_el_ingenio, ci=None, scatter_kws={'s': 10}, line_kws={'color': 'red'})
+plt.xlabel('Area construida')
+plt.ylabel('Precio por millon')
+plt.title('Simple Linear Regression')
+plt.show()
+```
+
+We performed the ANOVA of the model
+
+```{python}
+anova_results = sm.stats.anova_lm(modelo2, typ=2)
+print(anova_results)
+```
+
+In particular, the variable "Area_contruida" has an F-value of 331.11 with a p-value of practically zero, suggesting that it is highly significant in explaining the variability in "Precio_millon". Similarly, the variable "Tipo_Dummy" has an F-value of 28.38 and a very low p-value, suggesting that it is also significant in explaining the variability in "Precio_millon".
+
+```{python}
+checkModelAssumptions(modelo2)
+```
+
+# Punto 2
+
+```{python}
+data = pd.read_csv('datosME.txt', header=None, delim_whitespace=True, names=['Masa', 'Edad'])
+#Center the data
+x_mean = data['Edad'].mean()
+data['xi'] = data['Edad'] - x_mean
+data['xi2'] = data['xi']**2
+```
+
+```{python}
+modelo = smf.ols(formula='Masa ~ xi + np.power(xi, 2)', data=data).fit()
+```
+
+```{python}
+xi_range = np.linspace(data['xi'].min(), data['xi'].max(), 500)
+y_pred = modelo.predict(exog=dict(xi=xi_range, xi2=xi_range**2))
+plt.scatter(data['xi'], data['Masa'])
+plt.plot(xi_range, y_pred, color='red')
+plt.xlabel('xi')
+plt.ylabel('Masa')
+plt.show()
+```
+
+```{python}
+print(modelo.summary())
+```
+
+The parameter xi is the coefficient associated with the independent variable xi, which is the centered age. The negative value of -1.1840 indicates that there is a negative relationship between age and mass. That is, as age increases, mass is expected to decrease by 1.1840 kg.
+
+The parameter np.power(xi, 2) is the coefficient associated with the independent variable xi squared, which is age centered and squared. The value of 0.0148 indicates that there is a positive relationship between age and mass, but its p-value is 0.081, suggesting that it is not significant at the 0.05 significance level.
+
+Let
+$$H_0 : \text{the quadratic term of the model is 0} $$
+$$H_1 : \text{the quadratic term of the model is different from 0} $$
+
+If the p-value associated with the F-test is less than the chosen significance level ($\alpha=0.05$), then we reject the null hypothesis.
+
+```{python}
+# Hypothesis test to eliminate the quadratic term
+p_val = modelo.f_test("np.power(xi, 2) = 0").pvalue
+print(p_val)
+if p_val <= 0.05: print("Se rechaza H0")
+else: print("No se rechaza H0")
+```
+
+It is concluded that there is not enough statistical evidence to claim that the quadratic term is important in the model. This means that the option of eliminating the quadratic term from the model can be considered.
+
+```{python}
+data['Edad2'] = data['Edad']**2
+sns.heatmap(data.corr(), square=True, annot=True)
+```
+
+As can be seen in the correlation table, the variable Edad and Edad**2 are highly positively related. While centering the data and their respective square have a correlation close to zero (-0.038) indicating that there is no strong relationship between the two variables. Therefore, the transformation of the initial variable (centering the variable) is justified to eliminate the multicollinearity between the variable and its quadratic form.
+
