@@ -151,7 +151,9 @@ dtype: int64</code></pre>
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># delete records that have more than 6 missing data in their columns</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.dropna(thresh<span class="op">=</span><span class="bu">len</span>(df.columns)<span class="op">-</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.dropna(thresh<span class="op">=</span><span class="bu">len</span>(df.columns)<span class="op">-</span><span class="dv">6</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtain all the variants of "El Ingenio" in the list of districts</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>df.loc[df[<span class="st">'Barrio'</span>].<span class="bu">str</span>.contains(<span class="st">'ingenio'</span>, case<span class="op">=</span><span class="va">False</span>), <span class="st">'Barrio'</span>] <span class="op">=</span> <span class="st">'El Ingenio'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-outputid="08203b87-04db-4a16-af7f-b44bec283248" data-execution_count="5">
@@ -186,7 +188,7 @@ Cordenada_latitud        0
 dtype: int64</code></pre>
 </div>
 </div>
-<p>Since the ‘piso’ and ‘parqueaderos’ attributes will not be used in this study, we eliminated the columns by having so much missing data, % and 20% respectively.</p>
+<p>Since the ‘piso’ and ‘parqueaderos’ attributes will not be used in this study, we eliminated the columns by having so much missing data, 32% and 20% respectively.</p>
 <div class="cell" data-outputid="0b830a4a-f8a4-4647-8c6d-239d138c181d" data-execution_count="7">
 <details>
 <summary>Code</summary>
@@ -438,38 +440,43 @@ dtype: int64</code></pre>
 <div class="cell" data-outputid="cc5d11a3-c5d4-48ec-c00e-18f96f811b70" data-execution_count="15">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df_el_ingenio <span class="op">=</span> df[df[<span class="st">'Barrio'</span>] <span class="op">==</span> <span class="st">'el ingenio'</span>][[<span class="st">'precio_millon'</span>, <span class="st">'Area_contruida'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df_el_ingenio <span class="op">=</span> df[df[<span class="st">'Barrio'</span>] <span class="op">==</span> <span class="st">'El Ingenio'</span>][[<span class="st">'precio_millon'</span>, <span class="st">'Area_contruida'</span>]]</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>dim_df <span class="op">=</span> df_el_ingenio.shape</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"The dataset of only 'El Inegnio' consists of </span><span class="sc">{</span>dim_df[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> rows and </span><span class="sc">{</span>dim_df[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> columns"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-stdout">
+<pre><code>The dataset of only 'El Inegnio' consists of 268 rows and 2 columns</code></pre>
+</div>
 </div>
 <div class="cell" data-outputid="3b7edd72-00df-4711-c97e-a54f4b8edd22" data-execution_count="16">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the SLR model</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>modelo <span class="op">=</span> smf.ols(<span class="st">'precio_millon ~ Area_contruida'</span>, data<span class="op">=</span>df_el_ingenio).fit()</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(modelo.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the SLR model</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>modelo <span class="op">=</span> smf.ols(<span class="st">'precio_millon ~ Area_contruida'</span>, data<span class="op">=</span>df_el_ingenio).fit()</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(modelo.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>                            OLS Regression Results                            
 ==============================================================================
-Dep. Variable:          precio_millon   R-squared:                       0.774
-Model:                            OLS   Adj. R-squared:                  0.773
-Method:                 Least Squares   F-statistic:                     684.2
-Date:                Tue, 04 Apr 2023   Prob (F-statistic):           1.80e-66
-Time:                        21:23:40   Log-Likelihood:                -1226.1
-No. Observations:                 202   AIC:                             2456.
-Df Residuals:                     200   BIC:                             2463.
+Dep. Variable:          precio_millon   R-squared:                       0.780
+Model:                            OLS   Adj. R-squared:                  0.779
+Method:                 Least Squares   F-statistic:                     944.1
+Date:                Tue, 11 Apr 2023   Prob (F-statistic):           1.73e-89
+Time:                        19:07:50   Log-Likelihood:                -1632.8
+No. Observations:                 268   AIC:                             3270.
+Df Residuals:                     266   BIC:                             3277.
 Df Model:                           1                                         
 Covariance Type:            nonrobust                                         
 ==================================================================================
                      coef    std err          t      P&gt;|t|      [0.025      0.975]
 ----------------------------------------------------------------------------------
-Intercept        195.7150     11.639     16.816      0.000     172.765     218.665
-Area_contruida     1.2116      0.046     26.157      0.000       1.120       1.303
+Intercept        192.0000     10.462     18.352      0.000     171.401     212.599
+Area_contruida     1.2187      0.040     30.726      0.000       1.141       1.297
 ==============================================================================
-Omnibus:                       39.056   Durbin-Watson:                   1.924
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):               98.633
-Skew:                           0.836   Prob(JB):                     3.82e-22
-Kurtosis:                       5.987   Cond. No.                         395.
+Omnibus:                       57.232   Durbin-Watson:                   1.878
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              161.407
+Skew:                           0.940   Prob(JB):                     8.93e-36
+Kurtosis:                       6.305   Cond. No.                         420.
 ==============================================================================
 
 Notes:
@@ -477,17 +484,17 @@ Notes:
 </div>
 </div>
 <p>The SLR model is given by:</p>
-<p><span class="math display">\[ Y = 1.21 X + 195.71 \]</span></p>
+<p><span class="math display">\[ Y = 1.21 X + 192.0 \]</span></p>
 <p>Where <span class="math inline">\(Y\)</span> is ‘precio_millon’ and ‘X’ is ‘Area_contruida’. The R-squared value of the model is approximately 0.78, which indicates that the proportion of the variability in the dependent variable is well explained by the independent variable. We can see that the standard error for both the intercept and the slope are small so the coefficients are accurate.</p>
 <div class="cell" data-outputid="b066edb3-7365-4ebb-f65e-5f287bb6f5e1" data-execution_count="17">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>plt.scatter(df_el_ingenio.Area_contruida, df_el_ingenio.precio_millon)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>plt.plot(df_el_ingenio.Area_contruida, modelo.predict(), color<span class="op">=</span><span class="st">'red'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Area construida'</span>)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Precio por millon'</span>)</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Simple Linear Regression'</span>)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>plt.scatter(df_el_ingenio.Area_contruida, df_el_ingenio.precio_millon)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>plt.plot(df_el_ingenio.Area_contruida, modelo.predict(), color<span class="op">=</span><span class="st">'red'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Area construida'</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Precio por millon'</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Simple Linear Regression'</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="Parcial_2_files/figure-html/cell-18-output-1.png" class="img-fluid"></p>
@@ -499,83 +506,83 @@ Notes:
 <div class="cell" data-execution_count="18">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> shapiro</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.stats.diagnostic <span class="im">import</span> het_breuschpagan</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> checkModelAssumptions(model):</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    residuos <span class="op">=</span> model.resid</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    fig, axs <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">2</span>, ncols<span class="op">=</span><span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">#QQ plot</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    sm.qqplot(residuos, line<span class="op">=</span><span class="st">'45'</span>, ax<span class="op">=</span>axs[<span class="dv">0</span>,<span class="dv">0</span>])</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">0</span>].set_title(<span class="st">'Residuals Q-Q plot'</span>)</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Residuals Histogram</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">1</span>].hist(residuos, bins<span class="op">=</span><span class="dv">30</span>, edgecolor<span class="op">=</span><span class="st">'black'</span>)</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">1</span>].set_xlabel(<span class="st">'Residuos'</span>)</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">1</span>].set_ylabel(<span class="st">'Frecuencia'</span>)</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">1</span>].set_title(<span class="st">'Residuals Histogram'</span>)</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Reiduals Boxplot</span></span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">2</span>].boxplot(residuos)</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">2</span>].set_ylabel(<span class="st">'Residuals'</span>)</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">2</span>].set_title(<span class="st">'Residuals Boxplot'</span>)</span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Residuals</span></span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">0</span>].scatter(model.fittedvalues, residuos)</span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">0</span>].plot([<span class="bu">min</span>(model.fittedvalues), <span class="bu">max</span>(model.fittedvalues)], [<span class="dv">0</span>, <span class="dv">0</span>], <span class="st">'k--'</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">0</span>].set_xlabel(<span class="st">'Fitted Values'</span>)</span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">0</span>].set_ylabel(<span class="st">'Residuals'</span>)</span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">0</span>].set_title(<span class="st">'Residuals'</span>)</span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Standarized residuals</span></span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>    predicciones <span class="op">=</span> model.predict()</span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>    residuos_estandarizados <span class="op">=</span> model.get_influence().resid_studentized_internal</span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">1</span>].scatter(predicciones, residuos_estandarizados)</span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">1</span>].plot([<span class="bu">min</span>(predicciones), <span class="bu">max</span>(predicciones)], [<span class="dv">0</span>, <span class="dv">0</span>], <span class="st">'k--'</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">1</span>].set_xlabel(<span class="st">'Valores predichos'</span>)</span>
-<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">1</span>].set_ylabel(<span class="st">'Residuos estandarizados'</span>)</span>
-<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">1</span>].set_title(<span class="st">'Standarized Residuals'</span>)</span>
-<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Plot fit</span></span>
-<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>    sm.graphics.plot_fit(model, <span class="st">'Area_contruida'</span>, ax<span class="op">=</span>axs[<span class="dv">1</span>,<span class="dv">2</span>])</span>
-<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">2</span>].set_xlabel(<span class="st">"Area construida"</span>)</span>
-<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">2</span>].set_ylabel(<span class="st">"Precio por millón"</span>)</span>
-<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">2</span>].set_title(<span class="st">"Linear Regression"</span>)</span>
-<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
-<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
-<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Normality test</span></span>
-<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'================= Normality test ================='</span>)</span>
-<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a>    stat, p <span class="op">=</span> shapiro(residuos)</span>
-<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Estadística de prueba:'</span>, stat)</span>
-<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Valor p:'</span>, p)</span>
-<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> p <span class="op">&lt;=</span> <span class="fl">0.05</span>: <span class="bu">print</span>(<span class="st">"Se rechaza H0"</span>)</span>
-<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>: <span class="bu">print</span>(<span class="st">"No se rechaza H0"</span>)</span>
-<span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Homoscedasticity test</span></span>
-<span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'================= Homoscedasticity test ================='</span>)</span>
-<span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a>    lm, lm_pvalue, fvalue, f_pvalue <span class="op">=</span> het_breuschpagan(residuos, model.model.exog)</span>
-<span id="cb24-52"><a href="#cb24-52" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Lagrange multiplier statistic:'</span>, lm)</span>
-<span id="cb24-53"><a href="#cb24-53" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'p-value'</span>, lm_pvalue)</span>
-<span id="cb24-54"><a href="#cb24-54" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'F value:'</span>, fvalue)</span>
-<span id="cb24-55"><a href="#cb24-55" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'F p-value'</span>, f_pvalue)</span>
-<span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> lm_pvalue <span class="op">&lt;=</span> <span class="fl">0.05</span>: <span class="bu">print</span>(<span class="st">"Se rechaza H0"</span>)</span>
-<span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>: <span class="bu">print</span>(<span class="st">"No se rechaza H0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> shapiro</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.stats.diagnostic <span class="im">import</span> het_breuschpagan</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> checkModelAssumptions(model):</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    residuos <span class="op">=</span> model.resid</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    fig, axs <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">2</span>, ncols<span class="op">=</span><span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">#QQ plot</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    sm.qqplot(residuos, line<span class="op">=</span><span class="st">'45'</span>, ax<span class="op">=</span>axs[<span class="dv">0</span>,<span class="dv">0</span>])</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">0</span>].set_title(<span class="st">'Residuals Q-Q plot'</span>)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Residuals Histogram</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">1</span>].hist(residuos, bins<span class="op">=</span><span class="dv">30</span>, edgecolor<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">1</span>].set_xlabel(<span class="st">'Residuos'</span>)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">1</span>].set_ylabel(<span class="st">'Frecuencia'</span>)</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">1</span>].set_title(<span class="st">'Residuals Histogram'</span>)</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Reiduals Boxplot</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">2</span>].boxplot(residuos)</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">2</span>].set_ylabel(<span class="st">'Residuals'</span>)</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">0</span>,<span class="dv">2</span>].set_title(<span class="st">'Residuals Boxplot'</span>)</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Residuals</span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">0</span>].scatter(model.fittedvalues, residuos)</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">0</span>].plot([<span class="bu">min</span>(model.fittedvalues), <span class="bu">max</span>(model.fittedvalues)], [<span class="dv">0</span>, <span class="dv">0</span>], <span class="st">'k--'</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">0</span>].set_xlabel(<span class="st">'Fitted Values'</span>)</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">0</span>].set_ylabel(<span class="st">'Residuals'</span>)</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">0</span>].set_title(<span class="st">'Residuals'</span>)</span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Standarized residuals</span></span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>    predicciones <span class="op">=</span> model.predict()</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>    residuos_estandarizados <span class="op">=</span> model.get_influence().resid_studentized_internal</span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">1</span>].scatter(predicciones, residuos_estandarizados)</span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">1</span>].plot([<span class="bu">min</span>(predicciones), <span class="bu">max</span>(predicciones)], [<span class="dv">0</span>, <span class="dv">0</span>], <span class="st">'k--'</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">1</span>].set_xlabel(<span class="st">'Valores predichos'</span>)</span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">1</span>].set_ylabel(<span class="st">'Residuos estandarizados'</span>)</span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">1</span>].set_title(<span class="st">'Standarized Residuals'</span>)</span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Plot fit</span></span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>    sm.graphics.plot_fit(model, <span class="st">'Area_contruida'</span>, ax<span class="op">=</span>axs[<span class="dv">1</span>,<span class="dv">2</span>])</span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">2</span>].set_xlabel(<span class="st">"Area construida"</span>)</span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">2</span>].set_ylabel(<span class="st">"Precio por millón"</span>)</span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>    axs[<span class="dv">1</span>,<span class="dv">2</span>].set_title(<span class="st">"Linear Regression"</span>)</span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Normality test</span></span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'================= Normality test ================='</span>)</span>
+<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a>    stat, p <span class="op">=</span> shapiro(residuos)</span>
+<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Estadística de prueba:'</span>, stat)</span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Valor p:'</span>, p)</span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> p <span class="op">&lt;=</span> <span class="fl">0.05</span>: <span class="bu">print</span>(<span class="st">"Se rechaza H0"</span>)</span>
+<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>: <span class="bu">print</span>(<span class="st">"No se rechaza H0"</span>)</span>
+<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Homoscedasticity test</span></span>
+<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'================= Homoscedasticity test ================='</span>)</span>
+<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a>    lm, lm_pvalue, fvalue, f_pvalue <span class="op">=</span> het_breuschpagan(residuos, model.model.exog)</span>
+<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Lagrange multiplier statistic:'</span>, lm)</span>
+<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'p-value'</span>, lm_pvalue)</span>
+<span id="cb25-54"><a href="#cb25-54" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'F value:'</span>, fvalue)</span>
+<span id="cb25-55"><a href="#cb25-55" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'F p-value'</span>, f_pvalue)</span>
+<span id="cb25-56"><a href="#cb25-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> lm_pvalue <span class="op">&lt;=</span> <span class="fl">0.05</span>: <span class="bu">print</span>(<span class="st">"Se rechaza H0"</span>)</span>
+<span id="cb25-57"><a href="#cb25-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>: <span class="bu">print</span>(<span class="st">"No se rechaza H0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-execution_count="19">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>checkModelAssumptions(modelo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>checkModelAssumptions(modelo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="Parcial_2_files/figure-html/cell-20-output-1.png" class="img-fluid"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>================= Normality test =================
-Estadística de prueba: 0.9449506402015686
-Valor p: 5.659239832311869e-07
+Estadística de prueba: 0.9344847798347473
+Valor p: 1.5990865298576296e-09
 Se rechaza H0
 ================= Homoscedasticity test =================
-Lagrange multiplier statistic: 46.49553687988353
-p-value 9.18273677648706e-12
-F value: 59.79961725467512
-F p-value 5.035974457263909e-13
+Lagrange multiplier statistic: 53.90972228889621
+p-value 2.0991640940017183e-13
+F value: 66.98102446388039
+F p-value 1.1443963502530689e-14
 Se rechaza H0</code></pre>
 </div>
 </div>
@@ -586,17 +593,16 @@ Se rechaza H0</code></pre>
 <div class="cell" data-execution_count="20">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> df[df[<span class="st">'Barrio'</span>] <span class="op">==</span> <span class="st">'el ingenio'</span>][[<span class="st">'precio_millon'</span>, <span class="st">'Area_contruida'</span>, <span class="st">'Tipo'</span>]]</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>df_casa <span class="op">=</span> df2[df2[<span class="st">'Tipo'</span>] <span class="op">==</span> <span class="st">'Casa'</span>]</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>df_apto <span class="op">=</span> df2[df2[<span class="st">'Tipo'</span>] <span class="op">==</span> <span class="st">'Apartamento'</span>]</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>plt.scatter(df_casa[<span class="st">'Area_contruida'</span>], df_casa[<span class="st">'precio_millon'</span>], marker<span class="op">=</span><span class="st">'o'</span>, label<span class="op">=</span><span class="st">'Casa'</span>)</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>plt.scatter(df_apto[<span class="st">'Area_contruida'</span>], df_apto[<span class="st">'precio_millon'</span>], marker<span class="op">=</span><span class="st">'x'</span>, label<span class="op">=</span><span class="st">'Apartamento'</span>)</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Configurar la gráfica</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Area construida'</span>)</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Precio (millones)'</span>)</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> df[df[<span class="st">'Barrio'</span>] <span class="op">==</span> <span class="st">'El Ingenio'</span>][[<span class="st">'precio_millon'</span>, <span class="st">'Area_contruida'</span>, <span class="st">'Tipo'</span>]]</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>df_casa <span class="op">=</span> df2[df2[<span class="st">'Tipo'</span>] <span class="op">==</span> <span class="st">'Casa'</span>]</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>df_apto <span class="op">=</span> df2[df2[<span class="st">'Tipo'</span>] <span class="op">==</span> <span class="st">'Apartamento'</span>]</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>plt.scatter(df_casa[<span class="st">'Area_contruida'</span>], df_casa[<span class="st">'precio_millon'</span>], marker<span class="op">=</span><span class="st">'o'</span>, label<span class="op">=</span><span class="st">'Casa'</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>plt.scatter(df_apto[<span class="st">'Area_contruida'</span>], df_apto[<span class="st">'precio_millon'</span>], marker<span class="op">=</span><span class="st">'x'</span>, label<span class="op">=</span><span class="st">'Apartamento'</span>)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Configurar la gráfica</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Area construida'</span>)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Precio (millones)'</span>)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="Parcial_2_files/figure-html/cell-21-output-1.png" class="img-fluid"></p>
@@ -609,63 +615,65 @@ Se rechaza H0</code></pre>
 <div class="cell" data-execution_count="21">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Create the dummy column</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>df_el_ingenio[<span class="st">'Tipo_Dummy'</span>] <span class="op">=</span> df2[<span class="st">"Tipo"</span>].<span class="bu">map</span>({<span class="st">"Casa"</span>: <span class="dv">0</span>, <span class="st">"Apartamento"</span>: <span class="dv">1</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Create the dummy column</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>df_el_ingenio[<span class="st">'Tipo_Dummy'</span>] <span class="op">=</span> df2[<span class="st">"Tipo"</span>].<span class="bu">map</span>({<span class="st">"Casa"</span>: <span class="dv">0</span>, <span class="st">"Apartamento"</span>: <span class="dv">1</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-execution_count="22">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#df_dummies = pd.get_dummies(df2['Tipo'], prefix='Tipo')</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co">#df_el_ingenio = pd.concat([df_el_ingenio, df_dummies], axis=1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co">#df_dummies = pd.get_dummies(df2['Tipo'], prefix='Tipo')</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">#df_el_ingenio = pd.concat([df_el_ingenio, df_dummies], axis=1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-outputid="181d1bed-7b0c-401f-9323-beb38d382d9d" data-execution_count="23">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajustar el modelo de regresión lineal</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>modelo2 <span class="op">=</span> smf.ols(formula<span class="op">=</span><span class="st">'precio_millon ~ Area_contruida + Tipo_Dummy'</span>, data<span class="op">=</span>df_el_ingenio).fit()</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(modelo2.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajustar el modelo de regresión lineal</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>modelo2 <span class="op">=</span> smf.ols(formula<span class="op">=</span><span class="st">'precio_millon ~ Area_contruida + Tipo_Dummy'</span>, data<span class="op">=</span>df_el_ingenio).fit()</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(modelo2.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>                            OLS Regression Results                            
 ==============================================================================
-Dep. Variable:          precio_millon   R-squared:                       0.802
-Model:                            OLS   Adj. R-squared:                  0.800
-Method:                 Least Squares   F-statistic:                     403.1
-Date:                Tue, 04 Apr 2023   Prob (F-statistic):           1.02e-70
-Time:                        21:23:43   Log-Likelihood:                -1212.7
-No. Observations:                 202   AIC:                             2431.
-Df Residuals:                     199   BIC:                             2441.
+Dep. Variable:          precio_millon   R-squared:                       0.808
+Model:                            OLS   Adj. R-squared:                  0.807
+Method:                 Least Squares   F-statistic:                     558.3
+Date:                Tue, 11 Apr 2023   Prob (F-statistic):           9.50e-96
+Time:                        19:07:52   Log-Likelihood:                -1614.5
+No. Observations:                 268   AIC:                             3235.
+Df Residuals:                     265   BIC:                             3246.
 Df Model:                           2                                         
 Covariance Type:            nonrobust                                         
 ==================================================================================
                      coef    std err          t      P&gt;|t|      [0.025      0.975]
 ----------------------------------------------------------------------------------
-Intercept        295.3695     21.659     13.637      0.000     252.659     338.080
-Area_contruida     1.0220      0.056     18.196      0.000       0.911       1.133
-Tipo_Dummy       -99.2499     18.631     -5.327      0.000    -135.990     -62.510
+Intercept        299.1564     19.811     15.100      0.000     260.148     338.164
+Area_contruida     1.0097      0.050     20.169      0.000       0.911       1.108
+Tipo_Dummy      -105.6143     16.975     -6.222      0.000    -139.038     -72.191
 ==============================================================================
-Omnibus:                       45.694   Durbin-Watson:                   1.965
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):              169.888
-Skew:                           0.835   Prob(JB):                     1.29e-37
-Kurtosis:                       7.171   Cond. No.                         999.
+Omnibus:                       63.550   Durbin-Watson:                   1.921
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              232.432
+Skew:                           0.950   Prob(JB):                     3.37e-51
+Kurtosis:                       7.148   Cond. No.                     1.08e+03
 ==============================================================================
 
 Notes:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 1.08e+03. This might indicate that there are
+strong multicollinearity or other numerical problems.</code></pre>
 </div>
 </div>
-<p>The model is given by: <span class="math display">\[ Y = 1.02 X_1 - 99.24 X_2 + 295.36 \]</span></p>
+<p>The model is given by: <span class="math display">\[ Y = 1.00 X_1 - 105.61 X_2 + 299.15 \]</span></p>
 <div class="cell" data-outputid="cf4553f4-44d8-4f83-a464-302887059a95" data-execution_count="24">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Graficar el modelo</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>sns.regplot(x<span class="op">=</span><span class="st">'Area_contruida'</span>, y<span class="op">=</span><span class="st">'precio_millon'</span>, data<span class="op">=</span>df_el_ingenio, ci<span class="op">=</span><span class="va">None</span>, scatter_kws<span class="op">=</span>{<span class="st">'s'</span>: <span class="dv">10</span>}, line_kws<span class="op">=</span>{<span class="st">'color'</span>: <span class="st">'red'</span>})</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Area construida'</span>)</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Precio por millon'</span>)</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Simple Linear Regression'</span>)</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Graficar el modelo</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>sns.regplot(x<span class="op">=</span><span class="st">'Area_contruida'</span>, y<span class="op">=</span><span class="st">'precio_millon'</span>, data<span class="op">=</span>df_el_ingenio, ci<span class="op">=</span><span class="va">None</span>, scatter_kws<span class="op">=</span>{<span class="st">'s'</span>: <span class="dv">10</span>}, line_kws<span class="op">=</span>{<span class="st">'color'</span>: <span class="st">'red'</span>})</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Area construida'</span>)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Precio por millon'</span>)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Simple Linear Regression'</span>)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="Parcial_2_files/figure-html/cell-25-output-1.png" class="img-fluid"></p>
@@ -675,35 +683,35 @@ Notes:
 <div class="cell" data-execution_count="25">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>anova_results <span class="op">=</span> sm.stats.anova_lm(modelo2, typ<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(anova_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>anova_results <span class="op">=</span> sm.stats.anova_lm(modelo2, typ<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(anova_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>                      sum_sq     df           F        PR(&gt;F)
-Area_contruida  3.224499e+06    1.0  331.110433  3.268170e-44
-Tipo_Dummy      2.763536e+05    1.0   28.377610  2.687289e-07
-Residual        1.937949e+06  199.0         NaN           NaN</code></pre>
+Area_contruida  4.115414e+06    1.0  406.782956  1.862197e-55
+Tipo_Dummy      3.916221e+05    1.0   38.709397  1.910241e-09
+Residual        2.680999e+06  265.0         NaN           NaN</code></pre>
 </div>
 </div>
-<p>In particular, the variable “Area_contruida” has an F-value of 331.11 with a p-value of practically zero, suggesting that it is highly significant in explaining the variability in “Precio_millon”. Similarly, the variable “Tipo_Dummy” has an F-value of 28.38 and a very low p-value, suggesting that it is also significant in explaining the variability in “Precio_millon”.</p>
+<p>In particular, the variable “Area_contruida” has an F-value of 406.78 with a p-value of practically zero, suggesting that it is highly significant in explaining the variability in “Precio_millon”. Similarly, the variable “Tipo_Dummy” has an F-value of 38.70 and a p-value of practically zero, suggesting that it is also significant in explaining the variability in “Precio_millon”.</p>
 <div class="cell" data-execution_count="26">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>checkModelAssumptions(modelo2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>checkModelAssumptions(modelo2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="Parcial_2_files/figure-html/cell-27-output-1.png" class="img-fluid"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>================= Normality test =================
-Estadística de prueba: 0.9320821762084961
-Valor p: 4.378554052664185e-08
+Estadística de prueba: 0.9257198572158813
+Valor p: 2.579057245544192e-10
 Se rechaza H0
 ================= Homoscedasticity test =================
-Lagrange multiplier statistic: 38.517190513868876
-p-value 4.326117895839744e-09
-F value: 23.442589885605535
-F p-value 7.21127318498435e-10
+Lagrange multiplier statistic: 49.262871586960415
+p-value 2.007720962860301e-11
+F value: 29.84098096481705
+F p-value 2.0505571951861922e-12
 Se rechaza H0</code></pre>
 </div>
 </div>
@@ -713,29 +721,29 @@ Se rechaza H0</code></pre>
 <div class="cell" data-execution_count="27">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.read_csv(<span class="st">'datosME.txt'</span>, header<span class="op">=</span><span class="va">None</span>, delim_whitespace<span class="op">=</span><span class="va">True</span>, names<span class="op">=</span>[<span class="st">'Masa'</span>, <span class="st">'Edad'</span>])</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Center the data</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>x_mean <span class="op">=</span> data[<span class="st">'Edad'</span>].mean()</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'xi'</span>] <span class="op">=</span> data[<span class="st">'Edad'</span>] <span class="op">-</span> x_mean</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'xi2'</span>] <span class="op">=</span> data[<span class="st">'xi'</span>]<span class="op">**</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.read_csv(<span class="st">'datosME.txt'</span>, header<span class="op">=</span><span class="va">None</span>, delim_whitespace<span class="op">=</span><span class="va">True</span>, names<span class="op">=</span>[<span class="st">'Masa'</span>, <span class="st">'Edad'</span>])</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Center the data</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>x_mean <span class="op">=</span> data[<span class="st">'Edad'</span>].mean()</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'xi'</span>] <span class="op">=</span> data[<span class="st">'Edad'</span>] <span class="op">-</span> x_mean</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'xi2'</span>] <span class="op">=</span> data[<span class="st">'xi'</span>]<span class="op">**</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-execution_count="28">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>modelo <span class="op">=</span> smf.ols(formula<span class="op">=</span><span class="st">'Masa ~ xi + np.power(xi, 2)'</span>, data<span class="op">=</span>data).fit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>modelo <span class="op">=</span> smf.ols(formula<span class="op">=</span><span class="st">'Masa ~ xi + np.power(xi, 2)'</span>, data<span class="op">=</span>data).fit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-execution_count="29">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>xi_range <span class="op">=</span> np.linspace(data[<span class="st">'xi'</span>].<span class="bu">min</span>(), data[<span class="st">'xi'</span>].<span class="bu">max</span>(), <span class="dv">500</span>)</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> modelo.predict(exog<span class="op">=</span><span class="bu">dict</span>(xi<span class="op">=</span>xi_range, xi2<span class="op">=</span>xi_range<span class="op">**</span><span class="dv">2</span>))</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>plt.scatter(data[<span class="st">'xi'</span>], data[<span class="st">'Masa'</span>])</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>plt.plot(xi_range, y_pred, color<span class="op">=</span><span class="st">'red'</span>)</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'xi'</span>)</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Masa'</span>)</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>xi_range <span class="op">=</span> np.linspace(data[<span class="st">'xi'</span>].<span class="bu">min</span>(), data[<span class="st">'xi'</span>].<span class="bu">max</span>(), <span class="dv">500</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> modelo.predict(exog<span class="op">=</span><span class="bu">dict</span>(xi<span class="op">=</span>xi_range, xi2<span class="op">=</span>xi_range<span class="op">**</span><span class="dv">2</span>))</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>plt.scatter(data[<span class="st">'xi'</span>], data[<span class="st">'Masa'</span>])</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>plt.plot(xi_range, y_pred, color<span class="op">=</span><span class="st">'red'</span>)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'xi'</span>)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Masa'</span>)</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="Parcial_2_files/figure-html/cell-30-output-1.png" class="img-fluid"></p>
@@ -744,7 +752,7 @@ Se rechaza H0</code></pre>
 <div class="cell" data-execution_count="30">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(modelo.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(modelo.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>                            OLS Regression Results                            
@@ -752,8 +760,8 @@ Se rechaza H0</code></pre>
 Dep. Variable:                   Masa   R-squared:                       0.763
 Model:                            OLS   Adj. R-squared:                  0.755
 Method:                 Least Squares   F-statistic:                     91.84
-Date:                Tue, 04 Apr 2023   Prob (F-statistic):           1.48e-18
-Time:                        21:23:45   Log-Likelihood:                -208.56
+Date:                Tue, 11 Apr 2023   Prob (F-statistic):           1.48e-18
+Time:                        19:07:54   Log-Likelihood:                -208.56
 No. Observations:                  60   AIC:                             423.1
 Df Residuals:                      57   BIC:                             429.4
 Df Model:                           2                                         
@@ -782,11 +790,11 @@ Notes:
 <div class="cell" data-execution_count="31">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hypothesis test to eliminate the quadratic term</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>p_val <span class="op">=</span> modelo.f_test(<span class="st">"np.power(xi, 2) = 0"</span>).pvalue</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(p_val)</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> p_val <span class="op">&lt;=</span> <span class="fl">0.05</span>: <span class="bu">print</span>(<span class="st">"Se rechaza H0"</span>)</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>: <span class="bu">print</span>(<span class="st">"No se rechaza H0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hypothesis test to eliminate the quadratic term</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>p_val <span class="op">=</span> modelo.f_test(<span class="st">"np.power(xi, 2) = 0"</span>).pvalue</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(p_val)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> p_val <span class="op">&lt;=</span> <span class="fl">0.05</span>: <span class="bu">print</span>(<span class="st">"Se rechaza H0"</span>)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>: <span class="bu">print</span>(<span class="st">"No se rechaza H0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>0.08108689981613854
@@ -797,8 +805,8 @@ No se rechaza H0</code></pre>
 <div class="cell" data-execution_count="32">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'Edad2'</span>] <span class="op">=</span> data[<span class="st">'Edad'</span>]<span class="op">**</span><span class="dv">2</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>sns.heatmap(data.corr(), square<span class="op">=</span><span class="va">True</span>, annot<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'Edad2'</span>] <span class="op">=</span> data[<span class="st">'Edad'</span>]<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>sns.heatmap(data.corr(), square<span class="op">=</span><span class="va">True</span>, annot<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="32">
 <pre><code>&lt;Axes: &gt;</code></pre>

@@ -40,6 +40,8 @@ df.isnull().sum()
 #| id: Gg-zSSO4upv4
 # delete records that have more than 6 missing data in their columns
 df = df.dropna(thresh=len(df.columns)-6)
+# Obtain all the variants of "El Ingenio" in the list of districts
+df.loc[df['Barrio'].str.contains('ingenio', case=False), 'Barrio'] = 'El Ingenio'
 ```
 
 ```{python}
@@ -58,7 +60,7 @@ print(f"The dataset consists of {dim_df[0]} rows and {dim_df[1]} columns")
 df.isnull().sum()
 ```
 
-Since the 'piso' and 'parqueaderos' attributes will not be used in this study, we eliminated the columns by having so much missing data, \% and 20\% respectively.
+Since the 'piso' and 'parqueaderos' attributes will not be used in this study, we eliminated the columns by having so much missing data, 32\% and 20\% respectively.
 
 ```{python}
 #| id: gJy5r-Ksxxmj
@@ -193,7 +195,9 @@ As can be seen in the correlation table, the variables 'Area_contruida' and 'pre
 #| id: h3WPi-mukUny
 #| colab: {base_uri: 'https://localhost:8080/', height: 424}
 #| outputId: cc5d11a3-c5d4-48ec-c00e-18f96f811b70
-df_el_ingenio = df[df['Barrio'] == 'el ingenio'][['precio_millon', 'Area_contruida']]
+df_el_ingenio = df[df['Barrio'] == 'El Ingenio'][['precio_millon', 'Area_contruida']]
+dim_df = df_el_ingenio.shape
+print(f"The dataset of only 'El Inegnio' consists of {dim_df[0]} rows and {dim_df[1]} columns")
 ```
 
 ```{python}
@@ -207,7 +211,7 @@ print(modelo.summary())
 
 The SLR model is given by:
 
-$$ Y = 1.21 X + 195.71 $$
+$$ Y = 1.21 X + 192.0 $$
 
 Where $Y$ is 'precio_millon' and 'X' is 'Area_contruida'. The R-squared value of the model is approximately 0.78, which indicates that the proportion of the variability in the dependent variable is well explained by the independent variable. We can see that the standard error for both the intercept and the slope are small so the coefficients are accurate.
 
@@ -297,8 +301,7 @@ Analysis:
 # Categorical Regression
 
 ```{python}
-df2 = df[df['Barrio'] == 'el ingenio'][['precio_millon', 'Area_contruida', 'Tipo']]
-
+df2 = df[df['Barrio'] == 'El Ingenio'][['precio_millon', 'Area_contruida', 'Tipo']]
 df_casa = df2[df2['Tipo'] == 'Casa']
 df_apto = df2[df2['Tipo'] == 'Apartamento']
 plt.scatter(df_casa['Area_contruida'], df_casa['precio_millon'], marker='o', label='Casa')
@@ -338,7 +341,7 @@ print(modelo2.summary())
 ```
 
 The model is given by:
-$$ Y = 1.02 X_1 - 99.24 X_2 + 295.36 $$
+$$ Y = 1.00 X_1 - 105.61 X_2 + 299.15 $$
 
 ```{python}
 #| id: wd8x-uVNBRUr
@@ -359,7 +362,7 @@ anova_results = sm.stats.anova_lm(modelo2, typ=2)
 print(anova_results)
 ```
 
-In particular, the variable "Area_contruida" has an F-value of 331.11 with a p-value of practically zero, suggesting that it is highly significant in explaining the variability in "Precio_millon". Similarly, the variable "Tipo_Dummy" has an F-value of 28.38 and a very low p-value, suggesting that it is also significant in explaining the variability in "Precio_millon".
+In particular, the variable "Area_contruida" has an F-value of 406.78 with a p-value of practically zero, suggesting that it is highly significant in explaining the variability in "Precio_millon". Similarly, the variable "Tipo_Dummy" has an F-value of 38.70 and a p-value of practically zero, suggesting that it is also significant in explaining the variability in "Precio_millon".
 
 ```{python}
 checkModelAssumptions(modelo2)
