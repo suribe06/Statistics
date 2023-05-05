@@ -3,6 +3,8 @@ title: Taller 3. Eduardo Avendano y Santiago Uribe
 jupyter: python3
 ---
 
+
+
 ```{python}
 import pandas as pd
 import statsmodels.formula.api as smf
@@ -18,6 +20,8 @@ df = df.drop('name', axis=1)
 dim_df = df.shape
 print(f"The dataset consists of {dim_df[0]} rows and {dim_df[1]} columns")
 ```
+
+Data types of the columns:
 
 ```{python}
 df.dtypes
@@ -72,6 +76,8 @@ plt.tight_layout()
 plt.show()
 ```
 
+The analysis conducted shows that both in the histograms and box plots, the batting average and on-base percentage variables are skewed to the left, while the triples, errors, and stolen bases variables are skewed to the right, and these same three variables have the most atypical data. It can also be observed that the batting average and on-base percentage variables have a small standard deviation due to the size of the whiskers. Finally, for most variables, the median and mean have similar values.
+
 Correlation
 
 ```{python}
@@ -83,19 +89,55 @@ sns.heatmap(corr_matrix, square=True, annot=True, ax=ax)
 plt.show()
 ```
 
-Normality Test for the data
+The correlation matrix shows that several variables have high correlation coefficients (such as 0.89, 0.84, and 0.8). Therefore, it is important to exercise caution when dealing with variables that have a high degree of correlation, as they can have a significant impact on the model results.
+
+# Linear Regression Model
 
 ```{python}
 from scipy.stats import shapiro
+from statsmodels.stats.diagnostic import het_breuschpagan
 
-for col in df.columns:
-    data = df[col].tolist()
-    stat, p = shapiro(data)
-    ans = 'son normales' if p > 0.05 else 'no son normales'
-    print(f'Los datos de la variable {col} {ans}')
+def checkModelAssumptions(model):
+    residuos = model.resid
+    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(12, 6))
+    #QQ plot
+    sm.qqplot(residuos, line='45', ax=axs[0,0])
+    axs[0,0].set_title('Residuals Q-Q plot')
+    #Residuals Histogram
+    axs[0,1].hist(residuos, bins=30, edgecolor='black')
+    axs[0,1].set_xlabel('Residuos')
+    axs[0,1].set_ylabel('Frecuencia')
+    axs[0,1].set_title('Residuals Histogram')
+    #Reiduals Boxplot
+    axs[1,0].boxplot(residuos)
+    axs[1,0].set_ylabel('Residuals')
+    axs[1,0].set_title('Residuals Boxplot')
+    #Residuals
+    axs[1,1].scatter(model.fittedvalues, model.resid_pearson)
+    axs[1,1].plot([min(model.fittedvalues), max(model.fittedvalues)], [0, 0], 'k--', lw=2)
+    axs[1,1].set_xlabel('Fitted Values')
+    axs[1,1].set_ylabel('Residuals')
+    axs[1,1].set_title(' Standarized Residuals')
+    plt.tight_layout()
+    plt.show()
+
+    #Normality test
+    print('================= Normality test =================')
+    stat, p = shapiro(residuos)
+    print('Estadística de prueba:', stat)
+    print('Valor p:', p)
+    if p <= 0.05: print("Se rechaza H0")
+    else: print("No se rechaza H0")
+    #Homoscedasticity test
+    print('================= Homoscedasticity test =================')
+    lm, lm_pvalue, fvalue, f_pvalue = het_breuschpagan(residuos, model.model.exog)
+    print('Lagrange multiplier statistic:', lm)
+    print('p-value', lm_pvalue)
+    print('F value:', fvalue)
+    print('F p-value', f_pvalue)
+    if lm_pvalue <= 0.05: print("Se rechaza H0")
+    else: print("No se rechaza H0")
 ```
-
-# Linear Regression Model
 
 Dataset split into train and test
 
@@ -112,20 +154,20 @@ X_train, X_test, y_train, y_test = train_test_split(df.drop('salary', axis=1),
 
 ```{python}
 # Fitting the regression model
-model = sm.OLS(y_train, X_train).fit()
-print(model.summary())
+complete_model = sm.OLS(y_train, X_train).fit()
+print(complete_model.summary())
 ```
 
 ```{python}
 print('Coefficients LR')
-print(model.params)
+print(complete_model.params)
 ```
 
 Significant variables for the model
 
 ```{python}
 print('p-values variables')
-print(model.pvalues)
+print(complete_model.pvalues)
 ```
 
 Metrics to check the model
@@ -133,20 +175,28 @@ Metrics to check the model
 ```{python}
 from sklearn.metrics import mean_squared_error
 
-y_test_pred = model.predict(X_test)
+y_test_pred = complete_model.predict(X_test)
 mse = mean_squared_error(y_test, y_test_pred)
 print(f'MSE for the LR Model: {mse}')
 ```
 
-El modelo de regresión lineal de todas las variables tiene un R-cuadrado ajustado de 0.445, lo que sugiere que alrededor del 44.5% de la variabilidad de la variable de respuesta (salario) puede explicarse por las variables predictoras incluidas en el modelo. 
+Check model assumptions:
 
-Algunos de los coeficientes de regresión tienen p-valores altos, lo que sugiere que no son estadísticamente significativos. Por ejemplo, el coeficiente para "hits" tiene un p-valor de 0.936797, lo que sugiere que no es una variable significativa para predecir el salario. Además, la variable "RBI" tiene un p-valor marginalmente significativo (0.057780), lo que sugiere que puede ser una variable importante, pero se necesita más análisis para confirmar su importancia.
+```{python}
+checkModelAssumptions(complete_model)
+```
 
-Con respecto al MSE, el valor obtenido indica que hay una alta varianza entre los valores predichos por el modelo y los valores reales de la variable objetivo. En otras palabras, el modelo no se ajusta bien a los datos y tiene un rendimiento insuficiente en la tarea de predicción. Esto puede ocurrir debido a que hay variables que estan muy correlacionadas, hay valores de 0.89 y 0.84
+The linear regression model of all variables has an adjusted R-squared of 0.445, suggesting that approximately 44.5% of the variability of the response variable (salary) can be explained by the predictor variables included in the model.
+
+Some of the regression coefficients have high p-values, suggesting that they are not statistically significant. For example, the coefficient for "hits" has a p-value of 0.936797, suggesting that it is not a significant variable for predicting salary. In addition, the variable "RBI" has a marginally significant p-value (0.057780), suggesting that it may be an important variable, but further analysis is needed to confirm its significance.
+
+Regarding the MSE, the obtained value indicates that there is high variance between the values predicted by the model and the actual values of the target variable. In other words, the model does not fit the data well and underperforms in the prediction task. This may occur because there are variables that are highly correlated, as evidenced by values of 0.89 and 0.84.
+
+With respect to check the model assumptions since the null hypothesis is rejected in Shapiro Wilk test, the residuals are not from a normal distribution. It can also be verified that the QQ plot does not conform to a normal distribution. In homoscedasticity test, since H0 is not rejected, it means that errors have a constant variance in all observations and, therefore, there is no heteroscedasticity. Furthermore, it can be seen that the residuals are evenly and randomly distributed around zero.
 
 ### Modelos Propuestos:
 
-Seleccion de las mejores variables usando un enfoque voraz. En cada etapa, este estimador elige la mejor característica para añadir basándose en la puntuación de validación cruzada de un estimador.
+Selection of the best variables using a greedy approach. At each stage, this estimator chooses the best feature to add based on the cross-validation score of an estimator.
 
 ```{python}
 from sklearn.feature_selection import SequentialFeatureSelector
@@ -178,75 +228,137 @@ mse_selected = mean_squared_error(y_test, y_pred_selected)
 print(f"MSE del modelo con variables seleccionadas: {mse_selected}")
 ```
 
-Quitando pares de variables con alta correlacion, hits-runs (0.89)
+```{python}
+residuos = y_test - y_pred_selected
+#Normality test
+print('================= Normality test =================')
+stat, p = shapiro(residuos)
+print('Estadística de prueba:', stat)
+print('Valor p:', p)
+if p <= 0.05: print("Se rechaza H0")
+else: print("No se rechaza H0")
+#Homoscedasticity test
+print('================= Homoscedasticity test =================')
+lm, lm_pvalue, fvalue, f_pvalue = het_breuschpagan(residuos, X_test)
+print('Lagrange multiplier statistic:', lm)
+print('p-value', lm_pvalue)
+print('F value:', fvalue)
+print('F p-value', f_pvalue)
+if lm_pvalue <= 0.05: print("Se rechaza H0")
+else: print("No se rechaza H0")
+```
+
+For both tests (homoscedasticity and normality) H0 is not rejected, so the residuals come from a normal distribution and have constant variance.
+
+Model removing pairs of variables with high correlation, hits-runs (0.89) 
 
 ```{python}
 df_copy = df.copy()
 df_copy = df_copy.drop(['hits', 'runs'], axis=1)
 X_train, X_test, y_train, y_test = train_test_split(df_copy.drop('salary', axis=1), 
                                                     df_copy['salary'], test_size=0.2, random_state=123)
-model = sm.OLS(y_train, X_train).fit()
-print(model.summary())
+model2 = sm.OLS(y_train, X_train).fit()
+print(model2.summary())
 ```
 
 ```{python}
-y_test_pred = model.predict(X_test)
+y_test_pred = model2.predict(X_test)
 mse = mean_squared_error(y_test, y_test_pred)
 print(f'MSE for the LR Model: {mse}')
 ```
 
-Quitando pares de variables con alta correlacion, hits-runs (0.89) y dooubles-homeruns (0.84)
+```{python}
+checkModelAssumptions(model2)
+```
+
+The linear regression model has an adjusted R-squared of 0.454, suggesting that approximately 45.4% of the variability of the response variable (salary) can be explained by the predictor variables included in the model.
+
+The MSE is slightly higher than the full model.
+
+Since the null hypothesis is rejected in Shapiro Wilk test, the residuals are not from a normal distribution. In homoscedasticity test, since H0 is not rejected, it means that errors have a constant variance in all observations and, therefore, there is no heteroscedasticity. Furthermore, it can be seen that the residuals are evenly and randomly distributed around zero.
+
+Model removing pairs of variables with high correlation, hits-runs (0.89) and doubles-homeruns (0.84)
 
 ```{python}
 df_copy = df.copy()
 df_copy = df_copy.drop(['hits', 'runs', 'dooubles', 'homeruns'], axis=1)
 X_train, X_test, y_train, y_test = train_test_split(df_copy.drop('salary', axis=1), 
                                                     df_copy['salary'], test_size=0.2, random_state=123)
-model = sm.OLS(y_train, X_train).fit()
-print(model.summary())
+model3 = sm.OLS(y_train, X_train).fit()
+print(model3.summary())
 ```
 
 ```{python}
-y_test_pred = model.predict(X_test)
+y_test_pred = model3.predict(X_test)
 mse = mean_squared_error(y_test, y_test_pred)
 print(f'MSE for the LR Model: {mse}')
 ```
 
-Quitando pares de variables con alta correlacion, hits-runs (0.89) y OBP-batting (0.8)
+```{python}
+checkModelAssumptions(model3)
+```
+
+The linear regression model has an adjusted R-squared of 0.458, suggesting that approximately 45.8% of the variability of the response variable (salary) can be explained by the predictor variables included in the model.
+
+In terms of the MSE, it has a lower MSE than the full model, which indicates that this model fits the data better, although the MSE is still high.
+
+Since the null hypothesis is rejected in Shapiro Wilk test, the residuals are not from a normal distribution. In homoscedasticity test, since H0 is not rejected, it means that errors have a constant variance in all observations and, therefore, there is no heteroscedasticity. Furthermore, it can be seen that the residuals are evenly and randomly distributed around zero.
+
+Model removing pairs of variables with high correlations, hits-runs (0.89) and OBP-batting (0.8)
 
 ```{python}
 df_copy = df.copy()
 df_copy = df_copy.drop(['hits', 'runs', 'OBP', 'batting'], axis=1)
 X_train, X_test, y_train, y_test = train_test_split(df_copy.drop('salary', axis=1), 
                                                     df_copy['salary'], test_size=0.2, random_state=123)
-model = sm.OLS(y_train, X_train).fit()
-print(model.summary())
+model4 = sm.OLS(y_train, X_train).fit()
+print(model4.summary())
 ```
 
 ```{python}
-y_test_pred = model.predict(X_test)
+y_test_pred = model4.predict(X_test)
 mse = mean_squared_error(y_test, y_test_pred)
 print(f'MSE for the LR Model: {mse}')
 ```
 
-Modelo eliminando las variables con mayor p-value del modelo completo:
+```{python}
+checkModelAssumptions(model4)
+```
+
+The linear regression model has an adjusted R-squared of 0.463, suggesting that approximately 46.3% of the variability of the response variable (salary) can be explained by the predictor variables included in the model.
+
+The MSE is slightly higher than the full model.
+
+Since the null hypothesis is rejected in Shapiro Wilk test, the residuals are not from a normal distribution. In homoscedasticity test, since H0 is rejected, it means that there is sufficient evidence to conclude that the variance of the errors is not constant and, therefore, that there is heteroscedasticity in the model.
+
+Model removing the variables with the highest p-value from the complete model:
 
 ```{python}
 df_copy = df.copy()
 df_copy = df_copy.drop(['hits', 'walks', 'OBP', 'batting'], axis=1)
 X_train, X_test, y_train, y_test = train_test_split(df_copy.drop('salary', axis=1), 
                                                     df_copy['salary'], test_size=0.2, random_state=123)
-model = sm.OLS(y_train, X_train).fit()
-print(model.summary())
+model5 = sm.OLS(y_train, X_train).fit()
+print(model5.summary())
 ```
 
 ```{python}
-y_test_pred = model.predict(X_test)
+y_test_pred = model5.predict(X_test)
 mse = mean_squared_error(y_test, y_test_pred)
 print(f'MSE for the LR Model: {mse}')
 ```
 
-Modelo teniendo en cuenta un analisis de PCA:
+```{python}
+checkModelAssumptions(model5)
+```
+
+The linear regression model has an adjusted R-squared of 0.467, suggesting that approximately 46.7% of the variability of the response variable (salary) can be explained by the predictor variables included in the model.
+
+In terms of the MSE, it has a lower MSE than the full model, which indicates that this model fits the data better, although the MSE is still high.
+
+Since the null hypothesis is rejected in Shapiro Wilk test, the residuals are not from a normal distribution. In homoscedasticity test, since H0 is not rejected, it means that errors have a constant variance in all observations and, therefore, there is no heteroscedasticity. Furthermore, it can be seen that the residuals are evenly and randomly distributed around zero.
+
+Model considering a PCA analysis:
 
 ```{python}
 from sklearn.decomposition import PCA
@@ -268,23 +380,33 @@ plt.show()
 ```
 
 ```{python}
-X_pca_df = pd.DataFrame(X_pca[:, :5], columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'])
+X_pca_df = pd.DataFrame(X_pca[:, :4], columns=['PC1', 'PC2', 'PC3', 'PC4'])
 X_pca_df['salary'] = df['salary']
 
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(X_pca_df.drop('salary', axis=1), X_pca_df['salary'], test_size=0.2, random_state=123)
-model = sm.OLS(y_train, X_train).fit()
-print(model.summary())
+model_pca = sm.OLS(y_train, X_train).fit()
+print(model_pca.summary())
 ```
 
 ```{python}
-y_test_pred = model.predict(X_test)
+y_test_pred = model_pca.predict(X_test)
 mse = mean_squared_error(y_test, y_test_pred)
 print(f'MSE for the LR Model: {mse}')
 ```
 
-RESUMEN DE RESULTADOS
+```{python}
+checkModelAssumptions(model_pca)
+```
+
+The linear regression model has an adjusted R-squared of 0.08, suggesting that approximately 8% of the variability of the response variable (salary) can be explained by the predictor variables included in the model.
+
+In terms of MSE it is the worst of all, we can see how it shoots up abruptly. The model does not fit the data
+
+Since the null hypothesis is rejected in Shapiro Wilk test, the residuals are not from a normal distribution. In homoscedasticity test, since H0 is not rejected, it means that errors have a constant variance in all observations and, therefore, there is no heteroscedasticity. Although the residuals have a random distribution, the residuals have a positive trend relative to the fitted values, this could indicate that the model is not capturing a nonlinear relationship between the predictor variables and the response variable
+
+### RESUMEN DE RESULTADOS
 
 | Modelo                          | MSE          |
 |---------------------------------|--------------|
@@ -294,7 +416,7 @@ RESUMEN DE RESULTADOS
 | Modelo 1 elimnado correlaciones | 488,929.62   |
 | Modelo 3 elimnado correlaciones | 496,001.74   |
 | Modelo Greedy                   | 500,367.14   |
-| Modelo PCA                      | 6,045,180.40 |
+| Modelo PCA                      | 6,201,010.12 |
 
 # Punto 2
 
@@ -333,11 +455,36 @@ model_poisson = sm.GLM(y_train, X_train, family=sm.families.Poisson()).fit()
 print(model_poisson.summary())
 ```
 
-Primeramente podemos hacer un analisis de significancia de las variables del modelo con respecto a su valor p. Como se puede ver en la tabla, todas las variables, excepto "religion" y "age_marriage", tienen valores p menores a 0.05, lo que indica que son estadísticamente significativas en el modelo. Por otro lado, como el valor p de "religion" y "age_marriage" son 0.119 > 0.05 y  0.066 > 0.05, respectivamente, no se puede afirmar que estas variable tengan un efecto significativo en el modelo.
+As shown in the table, all variables except "religion" and "age_marriage" have p-values less than 0.05, indicating that they are statistically significant in the model. However, since the p-values of "religion" and "age_marriage" are 0.119 > 0.05 and 0.066 > 0.05, respectively, it cannot be concluded that these variables have a significant effect on the model.
 
-El coeficiente negativo de "university", al ser una variable categorica binaria (si/no), sugiere que las mujeres con esta característica (es decir, un "si") tienen menos hijos.
+The negative coefficient of "university", as a binary categorical variable (yes/no), suggests that women with this characteristic (i.e., a "yes") have fewer children.
 
-Por otro lado, el coeficientes positivo de "rural" sugiere que las mujeres con estas caracteristica tienen mas hijos.
+On the other hand, the positive coefficient of "rural" suggests that women with this characteristic have more children.
+
+```{python}
+sm.qqplot(model_poisson.resid_response, line='s')
+plt.title('QQ-plot de los residuos')
+plt.show()
+```
+
+```{python}
+#Normality test
+print('================= Normality test =================')
+stat, p = shapiro(model_poisson.resid_response)
+print('Estadística de prueba:', stat)
+print('Valor p:', p)
+if p <= 0.05: print("Se rechaza H0")
+else: print("No se rechaza H0")
+#Homoscedasticity test
+print('================= Homoscedasticity test =================')
+lm, lm_pvalue, fvalue, f_pvalue = het_breuschpagan(model_poisson.resid_response, model_poisson.model.exog)
+print('Lagrange multiplier statistic:', lm)
+print('p-value', lm_pvalue)
+print('F value:', fvalue)
+print('F p-value', f_pvalue)
+if lm_pvalue <= 0.05: print("Se rechaza H0")
+else: print("No se rechaza H0")
+```
 
 ### Negative Binomial Model
 
@@ -350,7 +497,44 @@ model_nb = sm.GLM(y_train, X_train, family=sm.families.NegativeBinomial()).fit()
 print(model_nb.summary())
 ```
 
-Para comparar los 2 modelos usaremos el AIC (Akaike Information Criterion), que es un criterio de selección de modelos que busca equilibrar la complejidad del modelo con su capacidad para ajustarse a los datos. El AIC se calcula a partir del logaritmo de la función de verosimilitud del modelo y su complejidad. Cuanto menor sea el valor de AIC, mejor se ajustará el modelo a los datos. 
+```{python}
+sm.qqplot(model_nb.resid_response, line='s')
+plt.title('QQ-plot')
+plt.show()
+```
+
+```{python}
+#Normality test
+print('================= Normality test =================')
+stat, p = shapiro(model_nb.resid_response)
+print('Estadística de prueba:', stat)
+print('Valor p:', p)
+if p <= 0.05: print("Se rechaza H0")
+else: print("No se rechaza H0")
+#Homoscedasticity test
+print('================= Homoscedasticity test =================')
+lm, lm_pvalue, fvalue, f_pvalue = het_breuschpagan(model_nb.resid_response, model_nb.model.exog)
+print('Lagrange multiplier statistic:', lm)
+print('p-value', lm_pvalue)
+print('F value:', fvalue)
+print('F p-value', f_pvalue)
+if lm_pvalue <= 0.05: print("Se rechaza H0")
+else: print("No se rechaza H0")
+```
+
+```{python}
+resid_poisson = model_poisson.resid_response
+resid_nb = model_nb.resid_response
+
+plt.scatter(model_nb.fittedvalues, resid_nb, label='NB')
+plt.scatter(model_poisson.fittedvalues, resid_poisson, label='Poisson')
+plt.xlabel('Fitted Values')
+plt.ylabel('Residuals')
+plt.legend()
+plt.show()
+```
+
+To compare the 2 models we will use the AIC (Akaike Information Criterion), which is a model selection criterion that seeks to balance the complexity of the model with its ability to fit the data. The AIC is calculated from the logarithm of the model's likelihood function and its complexity. The lower the AIC value, the better the model fits the data.
 
 ```{python}
 # AIC y BIC del modelo Poisson
@@ -360,38 +544,5 @@ print("AIC Poisson:", poisson_aic)
 print("AIC Binomial Negativo:", nb_aic)
 ```
 
-Como se pueed apreciar, el modelo de Poisson es el que tiene menor AIC, por lo que es el modelo que mejor se ajusta a los datos.
-
-Residuos
-
-```{python}
-import matplotlib.pyplot as plt
-import statsmodels.api as sm
-
-# Definir los residuos del modelo Poisson
-resid_poisson = model_poisson.resid_response
-
-# Definir los residuos del modelo Binomial Negativo
-resid_nb = model_nb.resid_response
-
-plt.scatter(model_nb.fittedvalues, resid_nb, label='NB')
-plt.scatter(model_poisson.fittedvalues, resid_poisson, label='Poisson')
-plt.xlabel('Valores ajustados')
-plt.ylabel('Residuos')
-plt.legend()
-plt.show()
-```
-
-```{python}
-from scipy.stats import chi2
-
-# Calcular la prueba de razón de verosimilitud
-deg_free = model_nb.df_resid - model_poisson.df_resid  # Diferencia de grados de libertad
-lr = -2 * (model_poisson.llf - model_nb.llf)  # Estadístico de la prueba
-p = chi2.sf(lr, 1)  # Valor p
-
-# Imprimir resultados
-print("Chi-cuadrado:", lr)
-print("Valor p:", p)
-```
+Since the Poisson model has the lowest AIC, it is the model that best fits the data.
 
