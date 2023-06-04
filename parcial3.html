@@ -117,7 +117,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Missing values by column</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df.isnull().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="61">
 <pre><code>mpg             0
 cylinders       0
 displacement    0
@@ -134,7 +134,7 @@ dtype: int64</code></pre>
 <h1>Descriptive Statistics</h1>
 <div class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="62">
 <div>
 
 
@@ -254,13 +254,13 @@ dtype: int64</code></pre>
 </div>
 <div class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>int_attributes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div class="cell-output cell-output-display" data-execution_count="64">
 <pre><code>['cylinders', 'horsepower', 'weight', 'year', 'origin']</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>float_attributes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="65">
 <pre><code>['mpg', 'displacement', 'acceleration']</code></pre>
 </div>
 </div>
@@ -287,7 +287,7 @@ dtype: int64</code></pre>
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-9-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-9-output-1.png" width="1142" height="566"></p>
 </div>
 </div>
 </section>
@@ -314,7 +314,7 @@ dtype: int64</code></pre>
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-11-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-11-output-1.png" width="1142" height="566"></p>
 </div>
 </div>
 <p>The descriptive analysis performed reveals some interesting characteristics of the variables under study. It is observed that the variable “mpg” (miles per gallon) and “displacement” (engine displacement) show a rightward skewness in their distributions. This implies that there is a concentration of lower values at the left end of the distributions and a long tail towards higher values. On the other hand, the variable “acceleration” shows a distribution that could be considered centered, since the median and mean are approximately equal. In addition, the width of the box in the box plot indicates a low interquartile range.</p>
@@ -330,10 +330,18 @@ dtype: int64</code></pre>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>sns.heatmap(corr_matrix, square<span class="op">=</span><span class="va">True</span>, annot<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax)</span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-12-output-1.png" width="837" height="783"></p>
 </div>
 </div>
-<p>In the correlation analysis, the following relationships stand out: - The correlation between displacement and cylinders is 0.95. This strong positive correlation suggests that as engine displacement increases, the number of cylinders also increases. This makes sense, since larger engines tend to have more cylinders to generate more power. - The correlation between displacement and horsepower is 0.9. This positive correlation also indicates a strong relationship, meaning that as engine displacement increases, horsepower tends to increase as well. This is logical, as larger engines tend to have higher horsepower. - The correlation between horsepower and weight is 0.86. This positive correlation suggests that as engine horsepower increases, vehicle weight tends to increase as well. This could be attributed to the fact that more powerful vehicles often require heavier components to support that additional power. - The correlation between horsepower and cylinders is 0.84. This positive correlation indicates that as engine horsepower increases, the number of cylinders tends to increase as well. This is consistent with the correlation observed between displacement and cylinders, since both attributes are related to engine size and power (to take into account for a multiple linear regression model). - The correlation between mpg (miles per gallon) and weight is -0.83. This strong negative correlation indicates that as vehicle weight increases, fuel economy in terms of miles per gallon decreases. This is understandable, as heavier vehicles generally require more energy to move and therefore have higher fuel consumption. - The correlation between mpg and displacement is -0.81. This negative correlation suggests that as engine displacement increases, fuel economy in terms of miles per gallon decreases. This makes sense, as larger and more powerful engines tend to consume more fuel.</p>
+<p>In the correlation analysis, the following relationships stand out:</p>
+<ul>
+<li><p>The correlation between displacement and cylinders is 0.95. This strong positive correlation suggests that as engine displacement increases, the number of cylinders also increases. This makes sense, since larger engines tend to have more cylinders to generate more power.</p></li>
+<li><p>The correlation between displacement and horsepower is 0.9. This positive correlation also indicates a strong relationship, meaning that as engine displacement increases, horsepower tends to increase as well. This is logical, as larger engines tend to have higher horsepower.</p></li>
+<li><p>The correlation between horsepower and weight is 0.86. This positive correlation suggests that as engine horsepower increases, vehicle weight tends to increase as well. This could be attributed to the fact that more powerful vehicles often require heavier components to support that additional power.</p></li>
+<li><p>The correlation between horsepower and cylinders is 0.84. This positive correlation indicates that as engine horsepower increases, the number of cylinders tends to increase as well. This is consistent with the correlation observed between displacement and cylinders, since both attributes are related to engine size and power (to take into account for a multiple linear regression model).</p></li>
+<li><p>The correlation between mpg (miles per gallon) and weight is -0.83. This strong negative correlation indicates that as vehicle weight increases, fuel economy in terms of miles per gallon decreases. This is understandable, as heavier vehicles generally require more energy to move and therefore have higher fuel consumption.</p></li>
+<li><p>The correlation between mpg and displacement is -0.81. This negative correlation suggests that as engine displacement increases, fuel economy in terms of miles per gallon decreases. This makes sense, as larger and more powerful engines tend to consume more fuel.</p></li>
+</ul>
 <p>Based on this, the following models are proposed</p>
 <div class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Support functions</span></span>
@@ -406,7 +414,7 @@ Dep. Variable:              cylinders   R-squared:                       0.904
 Model:                            OLS   Adj. R-squared:                  0.904
 Method:                 Least Squares   F-statistic:                     3675.
 Date:                Sun, 04 Jun 2023   Prob (F-statistic):          1.30e-200
-Time:                        02:24:41   Log-Likelihood:                -305.62
+Time:                        02:36:43   Log-Likelihood:                -305.62
 No. Observations:                 392   AIC:                             615.2
 Df Residuals:                     390   BIC:                             623.2
 Df Model:                           1                                         
@@ -431,13 +439,13 @@ Notes:
 <div class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>plot_regression_model(model1, <span class="st">'displacement'</span>, <span class="st">'cylinders'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-15-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-15-output-1.png" width="576" height="442"></p>
 </div>
 </div>
 <div class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>checkModelAssumptions(model1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-16-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-16-output-1.png" width="1142" height="566"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>================= Normality test =================
@@ -464,7 +472,7 @@ Dep. Variable:             horsepower   R-squared:                       0.805
 Model:                            OLS   Adj. R-squared:                  0.805
 Method:                 Least Squares   F-statistic:                     1611.
 Date:                Sun, 04 Jun 2023   Prob (F-statistic):          1.51e-140
-Time:                        02:24:42   Log-Likelihood:                -1666.2
+Time:                        02:36:45   Log-Likelihood:                -1666.2
 No. Observations:                 392   AIC:                             3336.
 Df Residuals:                     390   BIC:                             3344.
 Df Model:                           1                                         
@@ -491,13 +499,13 @@ Notes:
 <div class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>plot_regression_model(model2, <span class="st">'displacement'</span>, <span class="st">'horsepower'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-18-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-18-output-1.png" width="593" height="442"></p>
 </div>
 </div>
 <div class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>checkModelAssumptions(model2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-19-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-19-output-1.png" width="1142" height="566"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>================= Normality test =================
@@ -524,7 +532,7 @@ Dep. Variable:              cylinders   R-squared:                       0.711
 Model:                            OLS   Adj. R-squared:                  0.710
 Method:                 Least Squares   F-statistic:                     957.7
 Date:                Sun, 04 Jun 2023   Prob (F-statistic):          4.63e-107
-Time:                        02:24:44   Log-Likelihood:                -522.02
+Time:                        02:36:47   Log-Likelihood:                -522.02
 No. Observations:                 392   AIC:                             1048.
 Df Residuals:                     390   BIC:                             1056.
 Df Model:                           1                                         
@@ -551,13 +559,13 @@ Notes:
 <div class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>plot_regression_model(model3, <span class="st">'horsepower'</span>, <span class="st">'cylinders'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-21-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-21-output-1.png" width="585" height="442"></p>
 </div>
 </div>
 <div class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>checkModelAssumptions(model3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-22-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-22-output-1.png" width="1142" height="566"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>================= Normality test =================
@@ -584,7 +592,7 @@ Dep. Variable:                 weight   R-squared:                       0.693
 Model:                            OLS   Adj. R-squared:                  0.692
 Method:                 Least Squares   F-statistic:                     878.8
 Date:                Sun, 04 Jun 2023   Prob (F-statistic):          6.02e-102
-Time:                        02:24:45   Log-Likelihood:                -2968.4
+Time:                        02:36:48   Log-Likelihood:                -2968.4
 No. Observations:                 392   AIC:                             5941.
 Df Residuals:                     390   BIC:                             5949.
 Df Model:                           1                                         
@@ -611,13 +619,13 @@ Notes:
 <div class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>plot_regression_model(model4, <span class="st">'mpg'</span>, <span class="st">'weight'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-24-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-24-output-1.png" width="601" height="442"></p>
 </div>
 </div>
 <div class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>checkModelAssumptions(model4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-25-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-25-output-1.png" width="1142" height="566"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>================= Normality test =================
@@ -647,7 +655,7 @@ Dep. Variable:                    mpg   R-squared:                       0.708
 Model:                            OLS   Adj. R-squared:                  0.705
 Method:                 Least Squares   F-statistic:                     234.2
 Date:                Sun, 04 Jun 2023   Prob (F-statistic):          6.18e-102
-Time:                        02:24:47   Log-Likelihood:                -1120.1
+Time:                        02:36:50   Log-Likelihood:                -1120.1
 No. Observations:                 392   AIC:                             2250.
 Df Residuals:                     387   BIC:                             2270.
 Df Model:                           4                                         
@@ -683,7 +691,7 @@ strong multicollinearity or other numerical problems.</code></pre>
 <div class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>checkModelAssumptions(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-27-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-27-output-1.png" width="1142" height="566"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>================= Normality test =================
@@ -728,7 +736,7 @@ Se rechaza H0</code></pre>
 <span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>plt.grid()</span>
 <span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-28-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-28-output-1.png" width="597" height="422"></p>
 </div>
 </div>
 <p>The first 3 components are chosen since they already explain 90% of the variance of the data.</p>
@@ -746,7 +754,7 @@ Dep. Variable:                    mpg   R-squared:                       0.788
 Model:                            OLS   Adj. R-squared:                  0.787
 Method:                 Least Squares   F-statistic:                     481.5
 Date:                Sun, 04 Jun 2023   Prob (F-statistic):          2.25e-130
-Time:                        02:24:49   Log-Likelihood:                -1056.9
+Time:                        02:36:52   Log-Likelihood:                -1056.9
 No. Observations:                 392   AIC:                             2122.
 Df Residuals:                     388   BIC:                             2138.
 Df Model:                           3                                         
@@ -776,7 +784,7 @@ Notes:
 <div class="cell" data-execution_count="29">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>checkModelAssumptions(model_pca)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="parcial3_files/figure-html/cell-30-output-1.png" class="img-fluid"></p>
+<p><img src="parcial3_files/figure-html/cell-30-output-1.png" width="1142" height="566"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>================= Normality test =================

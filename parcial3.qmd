@@ -115,12 +115,18 @@ plt.show()
 ```
 
 In the correlation analysis, the following relationships stand out:
-- The correlation between displacement and cylinders is 0.95. This strong positive correlation suggests that as engine displacement increases, the number of cylinders also increases. This makes sense, since larger engines tend to have more cylinders to generate more power.
-- The correlation between displacement and horsepower is 0.9. This positive correlation also indicates a strong relationship, meaning that as engine displacement increases, horsepower tends to increase as well. This is logical, as larger engines tend to have higher horsepower.
-- The correlation between horsepower and weight is 0.86. This positive correlation suggests that as engine horsepower increases, vehicle weight tends to increase as well. This could be attributed to the fact that more powerful vehicles often require heavier components to support that additional power.
-- The correlation between horsepower and cylinders is 0.84. This positive correlation indicates that as engine horsepower increases, the number of cylinders tends to increase as well. This is consistent with the correlation observed between displacement and cylinders, since both attributes are related to engine size and power (to take into account for a multiple linear regression model).
-- The correlation between mpg (miles per gallon) and weight is -0.83. This strong negative correlation indicates that as vehicle weight increases, fuel economy in terms of miles per gallon decreases. This is understandable, as heavier vehicles generally require more energy to move and therefore have higher fuel consumption.
-- The correlation between mpg and displacement is -0.81. This negative correlation suggests that as engine displacement increases, fuel economy in terms of miles per gallon decreases. This makes sense, as larger and more powerful engines tend to consume more fuel.
+
+* The correlation between displacement and cylinders is 0.95. This strong positive correlation suggests that as engine displacement increases, the number of cylinders also increases. This makes sense, since larger engines tend to have more cylinders to generate more power.
+
+* The correlation between displacement and horsepower is 0.9. This positive correlation also indicates a strong relationship, meaning that as engine displacement increases, horsepower tends to increase as well. This is logical, as larger engines tend to have higher horsepower.
+
+* The correlation between horsepower and weight is 0.86. This positive correlation suggests that as engine horsepower increases, vehicle weight tends to increase as well. This could be attributed to the fact that more powerful vehicles often require heavier components to support that additional power.
+
+* The correlation between horsepower and cylinders is 0.84. This positive correlation indicates that as engine horsepower increases, the number of cylinders tends to increase as well. This is consistent with the correlation observed between displacement and cylinders, since both attributes are related to engine size and power (to take into account for a multiple linear regression model).
+
+* The correlation between mpg (miles per gallon) and weight is -0.83. This strong negative correlation indicates that as vehicle weight increases, fuel economy in terms of miles per gallon decreases. This is understandable, as heavier vehicles generally require more energy to move and therefore have higher fuel consumption.
+
+* The correlation between mpg and displacement is -0.81. This negative correlation suggests that as engine displacement increases, fuel economy in terms of miles per gallon decreases. This makes sense, as larger and more powerful engines tend to consume more fuel.
 
 Based on this, the following models are proposed
 
